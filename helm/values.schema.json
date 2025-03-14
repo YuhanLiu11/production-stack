@@ -64,6 +64,12 @@
               "requestMemory": {
                 "type": "string"
               },
+              "limitCPU": {
+                "type": "integer"
+              },
+              "limitMemory": {
+                "type": "string"
+              },
               "requestGPU": {
                 "type": "integer"
               },
@@ -348,6 +354,9 @@
           }
         },
         "runtimeClassName": {
+          "type": "string"
+        },
+        "schedulerName": {
           "type": "string"
         }
       }

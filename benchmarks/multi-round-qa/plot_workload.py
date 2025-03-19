@@ -21,15 +21,27 @@ if __name__ == "__main__":
             ttfts = []
             QPS_RANGE = [0.1, 0.5, 0.9, 1.3, 1.7, 2.1]
             for qps in QPS_RANGE:
-                csv_file_name = f"{keyword}_qps_{qps}_users_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.csv"
+                csv_file_name = f"results/stack_qps_{qps}_users_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.csv"
                 # open file 
                 csv_file = pd.read_csv(csv_file_name)
                 ttft = csv_file['ttft'].mean()
 
                 ttfts.append(ttft)
             fig, ax = plt.subplots()
-            ax.plot(QPS_RANGE, ttfts, marker='o', label=f'Users: {num_users}, Rounds: {num_rounds}, Prompt: {system_prompt}, History: {chat_history}, Answer: {answer_len}')
+            ax.plot(QPS_RANGE, ttfts, marker='o', label=f'Stack')
             ax.set_xlabel('QPS')
             ax.set_ylabel('TTFT (seconds)')
-            fig.savefig(f"{keyword}_qps_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.png")
+
+            ttfts = []
+            QPS_RANGE = [0.1, 0.5, 0.9, 1.3, 1.7, 2.1]
+            for qps in QPS_RANGE:
+                csv_file_name = f"results/naive_qps_{qps}_users_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.csv"
+                # open file 
+                csv_file = pd.read_csv(csv_file_name)
+                ttft = csv_file['ttft'].mean()
+
+                ttfts.append(ttft)
+            ax.plot(QPS_RANGE, ttfts, marker='x', label=f'Basic')
+            ax.legend()
+            fig.savefig(f"qps_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.png")
             

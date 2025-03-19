@@ -36,8 +36,8 @@ def main(config_file, model, base_url, key):
                 answer_len = config.get('ANSWER_LEN', 100)
                 
                 # Run benchmarks for different QPS values
-                for qps in [0.1, 0.5, 0.9, 1.3, 1.7, 2.1]:
-                    output_file = f"{key}_qps_{qps}_users_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.csv"
+                for qps in [0.1, 0.5, 0.9, 1.3, 1.7, 2.1, 2.5, 2.9, 3.3]:
+                    output_file = f"results/{key}_qps_{qps}_users_{num_users}_rounds_{num_rounds}_prompt_{system_prompt}_history_{chat_history}_answer_{answer_len}.csv"
                     run_benchmark(num_users, num_rounds, system_prompt, chat_history, answer_len, model, base_url, qps, output_file)
     except FileNotFoundError:
         print(f"Error: The configuration file '{config_file}' was not found.")

@@ -43,7 +43,7 @@ from vllm.entrypoints.openai.protocol import (
 
 app = FastAPI()
 GLOBAL_ARGS = None
-MODEL_NAME = "fake_model_name"
+MODEL_NAME = "facebook/opt-125m"
 NUM_RUNNING_REQUESTS = 0
 
 

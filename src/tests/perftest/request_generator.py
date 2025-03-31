@@ -97,7 +97,7 @@ def main():
     processes = []
     api_key = "YOUR_API_KEY_HERE"
     base_url = "http://localhost:8000/v1"
-    model = "fake_model_name"
+    model = "facebook/opt-125m"
 
     for _ in range(args.num_workers):
         p = multiprocessing.Process(

@@ -135,7 +135,10 @@ def initialize_all(app: FastAPI, args):
             args.batch_processor, args.file_storage_path, app.state.batch_storage
         )
 
-    initialize_routing_logic(args.routing_logic, session_key=args.session_key)
+    initialize_routing_logic(args.routing_logic, session_key=args.session_key, 
+                             prefiller_model=args.prefiller_model,
+                             decoder_model=args.decoder_model
+                             )
 
     # Initialize feature gates
     initialize_feature_gates(args.feature_gates)
@@ -225,7 +228,7 @@ def main():
     initialize_all(app, args)
     if args.log_stats:
         threading.Thread(
-            target=log_stats, args=(args.log_stats_interval,), daemon=True
+            target=log_stats, args=(app, args.log_stats_interval), daemon=True
         ).start()
 
     # Workaround to avoid footguns where uvicorn drops requests with too

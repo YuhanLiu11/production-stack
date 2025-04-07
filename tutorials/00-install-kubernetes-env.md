@@ -93,12 +93,6 @@ Before you begin, ensure the following:
 
 ### Step 3: Installing Minikube with GPU Support
 
-Before proceeding, ensure Docker runs without requiring sudo. To add your user to the docker group, run:
-
-```bash
-sudo usermod -aG docker $USER && newgrp docker
-```
-
 1. Execute the script `install-minikube-cluster.sh`:
 
    ```bash
@@ -139,7 +133,7 @@ sudo usermod -aG docker $USER && newgrp docker
    The issue can be observed by one or more gpu-operator pods in `CrashLoopBackOff` status, and be confirmed by checking their logs. For example,
 
    ```console
-   $ kubectl -n gpu-operator logs daemonset/nvidia-device-plugin-daemonset -c nvidia-device-plugin
+   $ sudo kubectl -n gpu-operator logs daemonset/nvidia-device-plugin-daemonset -c nvidia-device-plugin
    IS_HOST_DRIVER=true
    NVIDIA_DRIVER_ROOT=/
    DRIVER_ROOT_CTR_PATH=/host
@@ -161,7 +155,7 @@ sudo usermod -aG docker $USER && newgrp docker
 1. Ensure Minikube is running:
 
    ```bash
-   minikube status
+   sudo minikube status
    ```
 
    Expected output:
@@ -178,7 +172,7 @@ sudo usermod -aG docker $USER && newgrp docker
 2. Verify GPU access within Kubernetes:
 
    ```bash
-   kubectl describe nodes | grep -i gpu
+   sudo kubectl describe nodes | grep -i gpu
    ```
 
    Expected output:
@@ -191,13 +185,13 @@ sudo usermod -aG docker $USER && newgrp docker
 3. Deploy a test GPU workload:
 
    ```bash
-   kubectl run gpu-test --image=nvidia/cuda:12.2.0-runtime-ubuntu22.04 --restart=Never -- nvidia-smi
+   sudo kubectl run gpu-test --image=nvidia/cuda:12.2.0-runtime-ubuntu22.04 --restart=Never -- nvidia-smi
    ```
 
     Wait for kubernetes to download and create the pod and then check logs to confirm GPU usage:
 
    ```bash
-   kubectl logs gpu-test
+   sudo kubectl logs gpu-test
    ```
 
    You should see the nvidia-smi output from the terminal

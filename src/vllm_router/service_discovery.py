@@ -1,20 +1,5 @@
-# Copyright 2024-2025 The vLLM Production Stack Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import abc
 import enum
-import os
 import threading
 import time
 from dataclasses import dataclass
@@ -155,11 +140,7 @@ class K8sServiceDiscovery(ServiceDiscovery):
         """
         url = f"http://{pod_ip}:{self.port}/v1/models"
         try:
-            headers = None
-            if VLLM_API_KEY := os.getenv("VLLM_API_KEY"):
-                logger.info(f"Using vllm server authentication")
-                headers = {"Authorization": f"Bearer {VLLM_API_KEY}"}
-            response = requests.get(url, headers=headers)
+            response = requests.get(url)
             response.raise_for_status()
             model_name = response.json()["data"][0]["id"]
         except Exception as e:
@@ -304,7 +285,7 @@ def _create_service_discovery(
         raise ValueError("Invalid service discovery type")
 
 
-def initialize_service_discovery(
+def InitializeServiceDiscovery(
     service_discovery_type: ServiceDiscoveryType, *args, **kwargs
 ) -> ServiceDiscovery:
     """
@@ -332,7 +313,7 @@ def initialize_service_discovery(
     return _global_service_discovery
 
 
-def reconfigure_service_discovery(
+def ReconfigureServiceDiscovery(
     service_discovery_type: ServiceDiscoveryType, *args, **kwargs
 ) -> ServiceDiscovery:
     """
@@ -351,7 +332,7 @@ def reconfigure_service_discovery(
     return _global_service_discovery
 
 
-def get_service_discovery() -> ServiceDiscovery:
+def GetServiceDiscovery() -> ServiceDiscovery:
     """
     Get the initialized service discovery module.
 
@@ -371,14 +352,15 @@ def get_service_discovery() -> ServiceDiscovery:
 if __name__ == "__main__":
     # Test the service discovery
     # k8s_sd = K8sServiceDiscovery("default", 8000, "release=test")
-    initialize_service_discovery(
+    InitializeServiceDiscovery(
         ServiceDiscoveryType.K8S,
         namespace="default",
         port=8000,
         label_selector="release=test",
     )
 
-    k8s_sd = get_service_discovery()
+    k8s_sd = GetServiceDiscovery()
+    import time
 
     time.sleep(1)
     while True:

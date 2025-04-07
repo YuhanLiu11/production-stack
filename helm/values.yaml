@@ -1,19 +1,14 @@
 # -- Default values for llmstack helm chart
 # -- Declare variables to be passed into your templates.
 
+
 # -- Serving engine configuratoon
 servingEngineSpec:
-  enableEngine: true
   # -- Customized labels for the serving engine deployment
   labels:
     environment: "test"
     release: "test"
-  # vllmApiKey: (optional) api key for securing the vLLM models. Can be either:
-  #   - A string containing the token directly (will be stored in a generated secret)
-  #   - An object referencing an existing secret:
-  #     secretName: "my-existing-secret"
-  #     secretKey: "vllm-api-key"
-  #
+
   # modelSpec - configuring multiple serving engines deployments that runs different models
   # Each entry in the modelSpec array should contain the following fields:
   # - name: (string) The name of the model, e.g., "example-model"
@@ -27,34 +22,11 @@ servingEngineSpec:
   # - requestCPU: (int) The number of CPUs requested for the model, e.g. 6
   # - requestMemory: (string) The amount of memory requested for the model, e.g., "16Gi"
   # - requestGPU: (int) The number of GPUs requested for the model, e.g., 1
-  # - requestGPUType: (Optional, string) The type of GPU requested, e.g., "nvidia.com/mig-4g.71gb". If not specified, defaults to "nvidia.com/gpu"
-  # - limitCPU: (Optional, string) The CPU limit for the model, e.g., "8"
-  # - limitMemory: (Optional, string) The memory limit for the model, e.g., "32Gi"
-  # Note: If limitCPU and limitMemory are not specified, only GPU resources will have limits set equal to their requests.
+  #
   # - pvcStorage: (Optional, string) The amount of storage requested for the model, e.g., "50Gi".
   # - pvcAccessMode: (Optional, list) The access mode policy for the mounted volume, e.g., ["ReadWriteOnce"]
   # - storageClass: (Optional, String) The storage class of the PVC e.g., "", default is ""
   # - pvcMatchLabels: (Optional, map) The labels to match the PVC, e.g., {model: "opt125m"}
-  # - extraVolumes: (Optional, list) Additional volumes to add to the pod, in Kubernetes volume format. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#volume-v1-core
-  #   Example for an emptyDir volume:
-  #   extraVolumes:
-  #   - name: tmp-volume
-  #     emptyDir:
-  #       medium: ""
-  #       sizeLimit: 5Gi
-  # - extraVolumeMounts: (Optional, list) Additional volume mounts to add to the container, in Kubernetes volumeMount format. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#volumemount-v1-core
-  #   Example for mounting the tmp-volume to /tmp:
-  #   extraVolumeMounts:
-  #   - name: tmp-volume
-  #     mountPath: /tmp
-  # - initContainer: (optional, list of objects) The configuration for the init container to be run before the main container.
-  #   - name: (string) The name of the init container, e.g., "init"
-  #   - image: (string) The Docker image for the init container, e.g., "busybox:latest"
-  #   - command: (optional, list) The command to run in the init container, e.g., ["sh", "-c"]
-  #   - args: (optional, list) Additional arguments to pass to the command, e.g., ["ls"]
-  #   - env: (optional, list) List of environment variables to set in the container, each being a map with:
-  #   - resources: (optional, map) The resource requests and limits for the container:
-  #   - mountPvcStorage: (optional, bool) Whether to mount the model's volume.
   #
   # - vllmConfig: (optional, map) The configuration for the VLLM model, supported options are:
   #   - enablePrefixCaching: (optional, bool) Enable prefix caching, e.g., false
@@ -81,7 +53,6 @@ servingEngineSpec:
   # - shmSize: (optional, string) The size of the shared memory, e.g., "20Gi"
   #
   # Example:
-  # vllmApiKey: "vllm_xxxxxxxxxxxxx"
   # modelSpec:
   # - name: "mistral"
   #   repository: "lmcache/vllm-openai"
@@ -98,14 +69,6 @@ servingEngineSpec:
   #     - ReadWriteOnce
   #   pvcMatchLabels:
   #     model: "mistral"
-  #   initContainer:
-  #     name: my-container
-  #     image: busybox
-  #     command: ["sh"]
-  #     env: {}
-  #     args: []
-  #     resources: {}
-  #     mountPvcStorage: true
   #
   #   vllmConfig:
   #     enableChunkedPrefill: false
@@ -119,7 +82,6 @@ servingEngineSpec:
   #     cpuOffloadingBufferSize: "30"
   #
   #   hf_token: "hf_xxxxxxxxxxxxx"
-  #
   #
   #   nodeSelectorTerms:
   #     - matchExpressions:
@@ -147,9 +109,8 @@ servingEngineSpec:
     # -- How often (in seconds) to perform the startup probe
     periodSeconds: 10
     # -- Number of times after which if a probe fails in a row, Kubernetes considers that the overall check has failed: the container is not ready
-    failureThreshold:
-      60
-      # -- Configuration of the Kubelet http request on the server
+    failureThreshold: 60
+     # -- Configuration of the Kubelet http request on the server
     httpGet:
       # -- Path to access on the HTTP server
       path: /health
@@ -158,7 +119,7 @@ servingEngineSpec:
 
   # -- Liveness probe configuration
   livenessProbe:
-    # -- Number of seconds after the container has started before liveness probe is initiated
+   # -- Number of seconds after the container has started before liveness probe is initiated
     initialDelaySeconds: 15
     # -- Number of times after which if a probe fails in a row, Kubernetes considers that the overall check has failed: the container is not alive
     failureThreshold: 3
@@ -184,40 +145,6 @@ servingEngineSpec:
 
   # -- RuntimeClassName configuration, set to "nvidia" if the model requires GPU
   runtimeClassName: "nvidia"
-
-  # -- SchedulerName configuration
-  schedulerName: ""
-
-  # -- Pod-level security context configuration. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#podsecuritycontext-v1-core
-  securityContext: {}
-    # -- Run as a non-root user ID
-    # runAsUser: 1000
-    # -- Run with a non-root group ID
-    # runAsGroup: 1000
-    # -- Run as non-root
-    # runAsNonRoot: true
-    # -- Set the seccomp profile
-    # seccompProfile:
-    #   type: RuntimeDefault
-    # -- Drop all capabilities
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # -- Set the file system group ID for all containers
-    # fsGroup: 1000
-
-  # -- Container-level security context configuration. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#securitycontext-v1-core
-  containerSecurityContext:
-    # -- Run as non-root
-    runAsNonRoot: false
-    # -- Don't allow privilege escalation
-    # allowPrivilegeEscalation: false
-    # -- Drop all capabilities
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # -- Read-only root filesystem
-    # readOnlyRootFilesystem: true
 
 routerSpec:
   # -- The docker image of the router. The following values are defaults:
@@ -262,10 +189,6 @@ routerSpec:
   # -- deployment strategy
   strategy: {}
 
-  # vllmApiKey: (optional) api key for securing the vLLM models. Must be an object referencing an existing secret
-  #   secretName: "my-existing-secret"
-  #   secretKey: "vllm-api-key"
-
   # -- router resource requests and limits
   resources:
     requests:
@@ -288,8 +211,7 @@ routerSpec:
     className: ""
 
     # -- Additional annotations for the Ingress resource
-    annotations:
-      {}
+    annotations: {}
       # kubernetes.io/ingress.class: alb
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
@@ -307,16 +229,6 @@ routerSpec:
     #    hosts:
     #      - vllm-router.local
 
-  # The node selector terms to match the nodes
-  # Example:
-  #   nodeSelectorTerms:
-  #     - matchExpressions:
-  #       - key: nvidia.com/gpu.product
-  #         operator: "In"
-  #         values:
-  #         - "NVIDIA-RTX-A6000"
-  nodeSelectorTerms: []
-
   # -- TODO: Readiness probe configuration
   #startupProbe:
   #  # -- Number of seconds after the container has started before startup probe is initiated
@@ -329,41 +241,3 @@ routerSpec:
   #  httpGet:
   #    # -- Path to access on the HTTP server
   #
-
-loraController:
-  enabled: false
-  replicaCount: 1
-  image:
-    repository: lmcache/lora-controller
-    tag: latest
-    pullPolicy: Always
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-  podAnnotations: {}
-  podSecurityContext: {}
-  securityContext: {}
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  extraEnv: []
-  extraVolumes: []
-  extraVolumeMounts: []
-  imagePullSecrets: []
-
-# Shared storage configuration for LoRA adapters
-sharedStorage:
-  enabled: false
-  storageClass: "standard"
-  size: "100Gi"
-  accessModes:
-    - ReadWriteMany
-  # Use either hostPath or nfs configuration
-  hostPath: ""
-  nfs:
-    server: ""
-    path: ""

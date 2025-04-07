@@ -6,14 +6,10 @@ This tutorial provides a step-by-step guide to setting up and running benchmarks
 
 ## Table of Contents
 
-- [Tutorial: Multi-Round QA Benchmark (Single-GPU)](#tutorial-multi-round-qa-benchmark-single-gpu)
-  - [Introduction](#introduction)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Step 1: Running Benchmarks with vLLM Production Stack](#step-1-running-benchmarks-with-vllm-production-stack)
-  - [Step 2: Running Benchmarks with Naive Kubernetes](#step-2-running-benchmarks-with-naive-kubernetes)
-  - [Step 3: Running Benchmarks with AIBrix](#step-3-running-benchmarks-with-aibrix)
-  - [Conclusion](#conclusion)
+1. [Prerequisites](#prerequisites)
+2. [Step 1: Running Benchmarks with vLLM Production Stack](#step-1-running-benchmarks-with-vllm-production-stack)
+3. [Step 2: Running Benchmarks with Naive Kubernetes](#step-2-running-benchmarks-with-naive-kubernetes)
+4. [Step 3: Running Benchmarks with AIBrix](#step-3-running-benchmarks-with-aibrix)
 
 ## Prerequisites
 
@@ -34,7 +30,7 @@ servingEngineSpec:
   modelSpec:
   - name: "llama3"
     repository: "lmcache/vllm-openai"
-    tag: "2025-03-10"
+    tag: "latest"
     modelURL: "meta-llama/Llama-3.1-8B-Instruct"
     replicaCount: 1
     requestCPU: 10
@@ -53,24 +49,13 @@ servingEngineSpec:
       enabled: true
       cpuOffloadingBufferSize: "60"
     hf_token: <YOUR_HUGGINGFACE_TOKEN>
-
-routerSpec:
-  resources:
-    requests:
-      cpu: "2"
-      memory: "8G"
-    limits:
-      cpu: "2"
-      memory: "8G"
-  routingLogic: "session"
-  sessionKey: "x-user-id"
 ```
 
 Deploy the vLLM Production Stack server by:
 
 ```bash
-helm repo add vllm https://vllm-project.github.io/production-stack
-helm install vllm vllm/vllm-stack -f stack.yaml
+sudo helm repo add vllm https://vllm-project.github.io/production-stack
+sudo helm install vllm vllm/vllm-stack -f stack.yaml
 ```
 
 Then you can verify the pod readiness:
@@ -82,7 +67,7 @@ kubectl get pods
 Once the pods are ready, run the port forwarding:
 
 ```bash
-kubectl port-forward svc/vllm-router-service 30080:80
+sudo kubectl port-forward svc/vllm-router-service 30080:80
 ```
 
 Finally, run the benchmarking code by:
@@ -104,7 +89,7 @@ servingEngineSpec:
   modelSpec:
   - name: "llama3"
     repository: "lmcache/vllm-openai"
-    tag: "2025-03-10"
+    tag: "latest"
     modelURL: "meta-llama/Llama-3.1-8B-Instruct"
     replicaCount: 1
     requestCPU: 10
@@ -129,8 +114,8 @@ servingEngineSpec:
 Deploy the Naive K8s stack server:
 
 ```bash
-helm repo add vllm https://vllm-project.github.io/production-stack
-helm install vllm vllm/vllm-stack -f naive.yaml
+sudo helm repo add vllm https://vllm-project.github.io/production-stack
+sudo helm install vllm vllm/vllm-stack -f naive.yaml
 ```
 
 Then you can verify the pod readiness:
@@ -142,7 +127,7 @@ kubectl get pods
 Once the pods are ready, run the port forwarding:
 
 ```bash
-kubectl port-forward svc/vllm-router-service 30080:80
+sudo kubectl port-forward svc/vllm-router-service 30080:80
 ```
 
 Finally, run the benchmarking code by:
@@ -164,10 +149,10 @@ We also changed the CPU memory limit in AIBrix's KV cache server config: At line
 
 Finally, we follow the steps in [AIBrix's official repo](https://aibrix.readthedocs.io/latest/getting_started/installation/lambda.html) to start AIBrix server and then run the benchmarking code by:
 
-```bash
+`bash
 bash warmup_single.sh llama3-1-8b http://localhost:8888/v1/
 bash run_single.sh llama3-1-8b http://localhost:8888/v1/ aibrix
-```
+`
 
 ## Conclusion
 

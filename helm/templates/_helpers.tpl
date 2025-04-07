@@ -99,22 +99,14 @@ requests:
   memory: {{ required "Value 'modelSpec.requestMemory' must be defined !" ($modelSpec.requestMemory | quote) }}
   cpu: {{ required "Value 'modelSpec.requestCPU' must be defined !" ($modelSpec.requestCPU | quote) }}
   {{- if (gt (int $modelSpec.requestGPU) 0) }}
-  {{- $gpuType := default "nvidia.com/gpu" $modelSpec.requestGPUType }}
-  {{ $gpuType }}: {{ required "Value 'modelSpec.requestGPU' must be defined !" (index $modelSpec.requestGPU | quote) }}
+  nvidia.com/gpu: {{ required "Value 'modelSpec.requestGPU' must be defined !" (index $modelSpec.requestGPU | quote) }}
   {{- end }}
-{{- if or (hasKey $modelSpec "limitMemory") (hasKey $modelSpec "limitCPU") (gt (int $modelSpec.requestGPU) 0) }}
 limits:
-  {{- if (hasKey $modelSpec "limitMemory") }}
-  memory: {{ $modelSpec.limitMemory | quote }}
-  {{- end }}
-  {{- if (hasKey $modelSpec "limitCPU") }}
-  cpu: {{ $modelSpec.limitCPU | quote }}
-  {{- end }}
+  memory: {{ required "Value 'modelSpec.requestMemory' must be defined !" ($modelSpec.requestMemory | quote) }}
+  cpu: {{ required "Value 'modelSpec.requestCPU' must be defined !" ($modelSpec.requestCPU | quote) }}
   {{- if (gt (int $modelSpec.requestGPU) 0) }}
-  {{- $gpuType := default "nvidia.com/gpu" $modelSpec.requestGPUType }}
-  {{ $gpuType }}: {{ required "Value 'modelSpec.requestGPU' must be defined !" (index $modelSpec.requestGPU | quote) }}
+  nvidia.com/gpu: {{ required "Value 'modelSpec.requestGPU' must be defined !" (index $modelSpec.requestGPU | quote) }}
   {{- end }}
-{{- end }}
 {{- end }}
 
 

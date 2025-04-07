@@ -401,21 +401,6 @@
         "requestStatsWindow": {
           "type": "integer"
         },
-        "vllmApiKey": {
-           "type": "object",
-            "properties": {
-              "secretName": {
-                "type": "string"
-              },
-              "secretKey": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "secretName",
-              "secretKey"
-            ]
-        },
         "labels": {
           "type": "object",
           "properties": {

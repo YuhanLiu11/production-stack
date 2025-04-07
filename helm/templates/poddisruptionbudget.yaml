@@ -1,4 +1,3 @@
-{{- if .Values.servingEngineSpec.enableEngine -}}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -6,4 +5,3 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   maxUnavailable: {{ default 1 .Values.servingEngineSpec.maxUnavailablePodDisruptionBudget }}
-{{- end }}

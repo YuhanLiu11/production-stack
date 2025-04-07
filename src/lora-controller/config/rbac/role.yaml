@@ -1,0 +1,48 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - production-stack.vllm.ai
+  resources:
+  - loraadapters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - production-stack.vllm.ai
+  resources:
+  - loraadapters/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - production-stack.vllm.ai
+  resources:
+  - loraadapters/status
+  verbs:
+  - get
+  - patch
+  - update

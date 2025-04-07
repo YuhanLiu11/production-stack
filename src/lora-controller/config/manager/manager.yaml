@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lora-controller
+  namespace: default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lora-controller
+  namespace: default
+  labels:
+    app: lora-controller
+spec:
+  selector:
+    matchLabels:
+      app: lora-controller
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: lora-controller
+    spec:
+      serviceAccountName: lora-controller
+      containers:
+      - name: manager
+        image: quay.io/chenw615/lora-controller:latest
+        imagePullPolicy: Always
+        args:
+        - "--zap-log-level=debug"
+        - "--zap-devel=true"  # Enable development mode for more detailed logging
+        env:
+        - name: ADAPTER_DOWNLOAD_PATH
+          value: "/models"
+        volumeMounts:
+        - name: shared-model-storage
+          mountPath: "/models"
+      volumes:
+      - name: shared-model-storage
+        persistentVolumeClaim:
+          claimName: vllm-lora-shared-storage-claim 

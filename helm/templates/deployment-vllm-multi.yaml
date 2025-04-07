@@ -1,4 +1,3 @@
-{{- if .Values.servingEngineSpec.enableEngine -}}
 {{- range $modelSpec := .Values.servingEngineSpec.modelSpec }}
 {{- with $ -}}
 apiVersion: apps/v1
@@ -279,5 +278,4 @@ data:
 {{- end }}
 {{- end }}
 ---
-{{- end }}
 {{- end }}

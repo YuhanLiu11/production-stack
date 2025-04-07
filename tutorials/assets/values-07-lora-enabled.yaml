@@ -1,4 +1,8 @@
 servingEngineSpec:
+  labels:
+    app: vllm
+    environment: "test"
+    release: "test"
   runtimeClassName: ""
   modelSpec:
     - name: "llama2-7b"
@@ -41,8 +45,19 @@ servingEngineSpec:
       pvcAccessMode:
         - ReadWriteOnce
 
+# Add shared storage configuration
+sharedStorage:
+  enabled: true
+  size: "100Gi"
+  storageClass: "standard"
+  hostPath: "/mnt/models"
+
   # Add longer startup probe settings
   startupProbe:
     initialDelaySeconds: 60
     periodSeconds: 30
     failureThreshold: 120 # Allow up to 1 hour for startup
+
+# Enable lora controller
+loraController:
+  enabled: true

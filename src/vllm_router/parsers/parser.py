@@ -99,7 +99,7 @@ def parse_args():
         "--routing-logic",
         type=str,
         required=True,
-        choices=["roundrobin", "session"],
+        choices=["roundrobin", "session", "kvaware"],
         help="The routing logic to use",
     )
     parser.add_argument(
@@ -209,7 +209,12 @@ def parse_args():
         choices=["critical", "error", "warning", "info", "debug", "trace"],
         help="Log level for uvicorn. Default is 'info'.",
     )
-
+    parser.add_argument(
+        "--lmcache-controller-port",
+        type=int,
+        default=None,
+        help="The port of the LMCache controller. Default is None.",
+    )
     args = parser.parse_args()
     validate_args(args)
     return args

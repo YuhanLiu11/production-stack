@@ -43,6 +43,9 @@ class EndpointInfo:
     # Model name
     model_name: str
 
+    # Model label
+    model_label: str
+
     # Added timestamp
     added_timestamp: float
 
@@ -76,11 +79,21 @@ class ServiceDiscovery(metaclass=abc.ABCMeta):
 
 
 class StaticServiceDiscovery(ServiceDiscovery):
+<<<<<<< HEAD
     def __init__(self, urls: List[str], models: List[str], aliases: List[str]):
         assert len(urls) == len(models), "URLs and models should have the same length"
         self.urls = urls
         self.models = models
         self.aliases = aliases
+=======
+    def __init__(self, urls: List[str], models: List[str], model_labels: List[str]):
+        assert (
+            len(urls) == len(models) == len(model_labels)
+        ), "URLs, models, and model_labels should have the same length"
+        self.urls = urls
+        self.models = models
+        self.model_labels = model_labels
+>>>>>>> 0b18b79 (Adding P/D support)
         self.added_timestamp = int(time.time())
 
     def get_endpoint_info(self) -> List[EndpointInfo]:
@@ -92,8 +105,10 @@ class StaticServiceDiscovery(ServiceDiscovery):
             a list of engine URLs
         """
         return [
-            EndpointInfo(url, model, self.added_timestamp)
-            for url, model in zip(self.urls, self.models)
+            EndpointInfo(url, model, model_label, self.added_timestamp)
+            for url, model, model_label in zip(
+                self.urls, self.models, self.model_labels
+            )
         ]
 
 
@@ -169,6 +184,20 @@ class K8sServiceDiscovery(ServiceDiscovery):
 
         return model_name
 
+    def _get_model_label(self, pod) -> Optional[str]:
+        """
+        Get the model label from the pod's metadata labels.
+
+        Args:
+            pod: The Kubernetes pod object
+
+        Returns:
+            The model label if found, None otherwise
+        """
+        if not pod.metadata.labels:
+            return None
+        return pod.metadata.labels.get("model")
+
     def _watch_engines(self):
         # TODO (ApostaC): remove the hard-coded timeouts
 
@@ -187,16 +216,25 @@ class K8sServiceDiscovery(ServiceDiscovery):
                     is_pod_ready = self._check_pod_ready(pod.status.container_statuses)
                     if is_pod_ready:
                         model_name = self._get_model_name(pod_ip)
+                        model_label = self._get_model_label(pod)
                     else:
                         model_name = None
+                        model_label = None
                     self._on_engine_update(
-                        pod_name, pod_ip, event_type, is_pod_ready, model_name
+                        pod_name,
+                        pod_ip,
+                        event_type,
+                        is_pod_ready,
+                        model_name,
+                        model_label,
                     )
             except Exception as e:
                 logger.error(f"K8s watcher error: {e}")
                 time.sleep(0.5)
 
-    def _add_engine(self, engine_name: str, engine_ip: str, model_name: str):
+    def _add_engine(
+        self, engine_name: str, engine_ip: str, model_name: str, model_label: str
+    ):
         logger.info(
             f"Discovered new serving engine {engine_name} at "
             f"{engine_ip}, running model: {model_name}"
@@ -205,6 +243,7 @@ class K8sServiceDiscovery(ServiceDiscovery):
             self.available_engines[engine_name] = EndpointInfo(
                 url=f"http://{engine_ip}:{self.port}",
                 model_name=model_name,
+                model_label=model_label,
                 added_timestamp=int(time.time()),
             )
 
@@ -220,6 +259,7 @@ class K8sServiceDiscovery(ServiceDiscovery):
         event: str,
         is_pod_ready: bool,
         model_name: Optional[str],
+        model_label: Optional[str],
     ) -> None:
         if event == "ADDED":
             if engine_ip is None:
@@ -231,7 +271,7 @@ class K8sServiceDiscovery(ServiceDiscovery):
             if model_name is None:
                 return
 
-            self._add_engine(engine_name, engine_ip, model_name)
+            self._add_engine(engine_name, engine_ip, model_name, model_label)
 
         elif event == "DELETED":
             if engine_name not in self.available_engines:

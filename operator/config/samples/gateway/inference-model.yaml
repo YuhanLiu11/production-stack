@@ -1,0 +1,13 @@
+# InferenceModel
+apiVersion: inference.networking.x-k8s.io/v1alpha2
+kind: InferenceModel
+metadata:
+  name: mistral-inference-model
+  namespace: default
+spec:
+  modelName: vllm-mistral
+  poolRef:
+    name: vllm-mistral-pool
+  targetModels:
+    - name: mistral-7b-v1
+      weight: 100

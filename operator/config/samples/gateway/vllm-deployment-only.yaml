@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-mistral
+  labels:
+    app: vllm-mistral         # <- must match InferencePool.selector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-mistral
+  template:
+    metadata:
+      labels:
+        app: vllm-mistral
+    spec:
+      containers:
+        - name: server
+          image: vllm/vllm-openai:latest
+          args: ["--model", "mistralai/Mistral-7B-Instruct-v0.2"]
+          env:
+            - name: HF_TOKEN                    # <-- vLLM checks this var
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: HF_TOKEN
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            limits:
+              nvidia.com/gpu: "1"

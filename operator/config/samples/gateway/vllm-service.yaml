@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-mistral
+  labels:
+    app: vllm-mistral
+spec:
+  selector:
+    app: vllm-mistral
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: http
+  type: ClusterIP

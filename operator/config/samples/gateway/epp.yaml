@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-mistral-epp
+  labels:
+    app: vllm-mistral-epp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-mistral-epp
+  template:
+    metadata:
+      labels:
+        app: vllm-mistral-epp
+    spec:
+      serviceAccountName: vllm-mistral-epp-sa
+      containers:
+        - name: picker
+          image: 1nfinity/gateway:latest
+          ports:
+            - containerPort: 9002

@@ -79,21 +79,10 @@ class ServiceDiscovery(metaclass=abc.ABCMeta):
 
 
 class StaticServiceDiscovery(ServiceDiscovery):
-<<<<<<< HEAD
-    def __init__(self, urls: List[str], models: List[str], aliases: List[str]):
+    def __init__(self, urls: List[str], models: List[str]):
         assert len(urls) == len(models), "URLs and models should have the same length"
         self.urls = urls
         self.models = models
-        self.aliases = aliases
-=======
-    def __init__(self, urls: List[str], models: List[str], model_labels: List[str]):
-        assert (
-            len(urls) == len(models) == len(model_labels)
-        ), "URLs, models, and model_labels should have the same length"
-        self.urls = urls
-        self.models = models
-        self.model_labels = model_labels
->>>>>>> 0b18b79 (Adding P/D support)
         self.added_timestamp = int(time.time())
 
     def get_endpoint_info(self) -> List[EndpointInfo]:
